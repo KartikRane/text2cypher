@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+.cache/
+final_model/
+.env
+.env.*
+.agents/
+.codex/
+*.safetensors
+*.bin
