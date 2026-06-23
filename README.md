@@ -9,62 +9,92 @@ inference are configured for CPU-only execution.
 Fine-tuned adapter available on HuggingFace Hub:
 https://huggingface.co/kv-rane/text2cypher-smollm2
 
+## Requirements
+
+- Python 3.11 (3.14 is not yet supported by the ML dependencies)
+- CPU is sufficient — no GPU required
+- ~4GB RAM recommended
+- ~3 hours for full training on CPU
+
 ## Setup
 
-Python 3.11 is recommended (3.14 is not yet supported by the ML dependencies).
+**Step 1 — Clone the repository:**
+```bash
+git clone https://github.com/KartikRane/text2cypher.git
+cd text2cypher
+```
 
+**Step 2 — Create and activate virtual environment:**
 ```bash
 python -m venv .venv
+
 # Windows PowerShell
 .venv\Scripts\Activate.ps1
+
+# Mac/Linux
+source .venv/bin/activate
+```
+
+**Step 3 — Install dependencies:**
+```bash
 pip install -r requirements.txt
 ```
 
-The model and dataset are downloaded from Hugging Face on first use.
+The model (`HuggingFaceTB/SmolLM2-135M-Instruct`) and dataset
+(`RomanTeucher/text2cypher-curated`) are downloaded automatically from
+HuggingFace on first use.
 
 ## Reproduce
 
-Run both commands from the repository root:
+### Train
 
+Full training on 1,000 examples (~ 3 hours on CPU):
 ```bash
 python src/train.py
-python src/evaluate.py
 ```
 
-Training uses three epochs, a batch size of four, a learning rate of `2e-4`,
-and validation at the end of each epoch. The final LoRA adapter and tokenizer
-are saved under `./final_model/`. Evaluation runs deterministic greedy decoding
-over all 50 test examples and overwrites `results/predictions.json`.
-
-For a quick test run on reduced data (~30 minutes on CPU):
-
+Quick test run on 200 examples (~30 minutes on CPU):
 ```bash
 python src/train.py --max-train-samples 200
 ```
 
-Paths and generation limits can be changed through command-line arguments:
+Training saves the final LoRA adapter and tokenizer to `./final_model/`.
+Intermediate checkpoints are saved to `./checkpoints/` after each epoch.
+
+**Training configuration:**
+- Epochs: 3
+- Batch size: 4
+- Learning rate: 2e-4
+- Max sequence length: 512 tokens
+- LoRA rank: 16, alpha: 32
+- Target modules: q_proj, v_proj
+- Trainable parameters: 921,600 (0.68% of 135M total)
+
+**Training results:**
+
+| Epoch | Train Loss | Val Loss |
+|-------|------------|----------|
+| 1 | 2.057 | 2.043 |
+| 2 | 1.823 | 1.744 |
+| 3 | 0.760 | 0.871 |
+
+### Evaluate
 
 ```bash
-python src/train.py --output-dir final_model --cache-dir .cache/huggingface
-python src/evaluate.py --model-dir final_model --output-file results/predictions.json
+python src/evaluate.py
 ```
 
-To publish the trained adapter after training:
+Runs greedy decoding on all 50 test examples and saves per-sample results
+to `results/predictions.json`.
 
-```bash
-huggingface-cli login
-python src/train.py --push-to-hub --hub-model-id kv-rane/text2cypher-smollm2
-```
-
-## Results
-
-Evaluated on 50 test examples:
+**Evaluation results:**
 
 | Metric | Score |
 |--------|-------|
 | Exact Match | 0.00% |
 | Token F1 | 27.4% |
 | Structural Validity | 74.0% |
+
 
 Token F1 improved 64% when scaling from 200 to 1,000 training examples
 (16.7% → 27.4%), confirming genuine learning from more data.
