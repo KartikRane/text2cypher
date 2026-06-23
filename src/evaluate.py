@@ -31,6 +31,12 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def structural_validity(predicted: str) -> int:
+    """Return 1 when a prediction has the minimum Cypher query structure."""
+    normalized = predicted.strip().upper()
+    return int(normalized.startswith("MATCH") and "RETURN" in normalized)
+
+
 def generate_predictions(
     model,
     tokenizer,
@@ -84,6 +90,7 @@ def generate_predictions(
                     "predicted": predicted,
                     "exact_match": int(predicted == ground_truth),
                     "token_f1": token_f1(predicted, ground_truth),
+                    "structural_validity": structural_validity(predicted),
                 }
             )
 
@@ -111,9 +118,13 @@ def main() -> None:
 
     exact_match_accuracy = sum(item["exact_match"] for item in results) / len(results)
     average_token_f1 = sum(item["token_f1"] for item in results) / len(results)
+    average_structural_validity = (
+        sum(item["structural_validity"] for item in results) / len(results)
+    )
     print(f"Evaluated {len(results)} test examples")
     print(f"Overall Exact Match Accuracy: {exact_match_accuracy:.4f}")
     print(f"Average Token F1: {average_token_f1:.4f}")
+    print(f"Structural Validity: {average_structural_validity:.4f}")
     print(f"Predictions saved to {args.output_file.resolve()}")
 
 
