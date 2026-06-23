@@ -136,7 +136,7 @@ would produce irreproducible results.
 ### What the model learned
 
 I first trained on 200 samples for quick pipeline validation (~30 minutes on
-CPU), then on the full 1,000 samples (~2.5 hours on CPU).
+CPU), then on the full 1,000 samples (~3 hours on CPU).
 
 Training on 1,000 examples reduced loss from 2.54 to 0.76 across 3 epochs.
 Validation loss tracked closely at 0.87, indicating no significant overfitting.

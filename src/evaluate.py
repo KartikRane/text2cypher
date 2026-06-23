@@ -21,7 +21,11 @@ from utils import (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model-dir", type=Path, default=Path("final_model"))
+    parser.add_argument(
+        "--model-dir",
+        default="final_model",
+        help="Local fine-tuned adapter directory or Hugging Face model ID.",
+    )
     parser.add_argument("--dataset-name", default=DEFAULT_DATASET_NAME)
     parser.add_argument("--output-file", type=Path, default=Path("results/predictions.json"))
     parser.add_argument("--cache-dir", type=Path, default=None)

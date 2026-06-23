@@ -6,6 +6,5 @@ final_model/
 .env
 .env.*
 .agents/
-.codex/
 *.safetensors
 *.bin

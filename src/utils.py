@@ -28,21 +28,23 @@ def load_tokenizer(model_name_or_path: str | Path) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
-def load_model_for_evaluation(model_dir: str | Path):
-    """Load a saved LoRA adapter and its base causal language model on CPU."""
-    model_dir = Path(model_dir)
-    if not model_dir.exists():
-        raise FileNotFoundError(
-            f"Fine-tuned model directory does not exist: {model_dir}. "
-            "Run src/train.py first."
-        )
+def load_model_for_evaluation(model_name_or_path: str | Path):
+    """Load either a saved LoRA adapter or a base causal language model on CPU."""
+    model_name_or_path = str(model_name_or_path)
+    local_path = Path(model_name_or_path)
 
-    peft_config = PeftConfig.from_pretrained(str(model_dir))
-    base_model = AutoModelForCausalLM.from_pretrained(
-        peft_config.base_model_name_or_path,
+    if local_path.exists() and (local_path / "adapter_config.json").exists():
+        peft_config = PeftConfig.from_pretrained(model_name_or_path)
+        base_model = AutoModelForCausalLM.from_pretrained(
+            peft_config.base_model_name_or_path,
+            device_map=None,
+        )
+        return PeftModel.from_pretrained(base_model, model_name_or_path)
+
+    return AutoModelForCausalLM.from_pretrained(
+        model_name_or_path,
         device_map=None,
     )
-    return PeftModel.from_pretrained(base_model, str(model_dir))
 
 
 def token_f1(predicted: str, ground_truth: str) -> float:
