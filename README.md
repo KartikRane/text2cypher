@@ -9,12 +9,15 @@ inference are configured for CPU-only execution.
 Fine-tuned adapter available on HuggingFace Hub:
 https://huggingface.co/kv-rane/text2cypher-smollm2
 
-## Requirements
+## Tested Configuration
 
-- Python 3.11 (3.14 is not yet supported by the ML dependencies)
-- CPU is sufficient — no GPU required
-- ~4GB RAM recommended
-- ~3 hours for full training on CPU
+The following reflects the configuration I used. Requirements may vary with different model settings, or training parameters.
+
+- Python 3.11 (Python 3.14 is not yet supported by some ML dependencies)
+- CPU-only training; no GPU required
+- Approximately 4 GB RAM recommended
+- Approximately 3 hours for a full training run on CPU
+
 
 ## Setup
 
