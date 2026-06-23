@@ -14,7 +14,7 @@ https://huggingface.co/kv-rane/text2cypher-smollm2
 The following reflects the configuration I used. Requirements may vary with different model settings, or training parameters.
 
 - Python 3.11 (Python 3.14 is not yet supported by some ML dependencies)
-- CPU-only training; no GPU required
+- CPU-only training
 - Approximately 4 GB RAM recommended
 - Approximately 3 hours for a full training run on CPU
 
