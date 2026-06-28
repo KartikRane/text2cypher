@@ -13,7 +13,7 @@ torch.set_num_threads(4)
 
 from peft import LoraConfig, get_peft_model  # noqa: E402
 from transformers import AutoModelForCausalLM, set_seed  # noqa: E402
-from trl import SFTConfig, SFTTrainer  # noqa: E402
+from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer  # noqa: E402
 
 from dataset import load_text2cypher_dataset  # noqa: E402
 from utils import DEFAULT_DATASET_NAME, DEFAULT_MODEL_NAME, load_tokenizer  # noqa: E402
@@ -26,6 +26,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=Path("final_model")) #"imp"
     parser.add_argument("--cache-dir", type=Path, default=None)
     parser.add_argument("--max-seq-length", type=int, default=512)
+    parser.add_argument(
+        "--loss-mode",
+        choices=["full", "completion"],
+        default="full",
+        help=(
+            "Training loss mode. 'full' trains on schema, question, and Cypher "
+            "tokens; 'completion' trains only on tokens after '### Cypher:'."
+        ),
+    )
     parser.add_argument(
         "--max-train-samples",
         type=int,
@@ -91,6 +100,7 @@ def create_trainer(
     train_dataset,
     eval_dataset,
     training_config: SFTConfig,
+    loss_mode: str,
 ) -> SFTTrainer:
     """Construct SFTTrainer across TRL's tokenizer API rename."""
     supported = inspect.signature(SFTTrainer.__init__).parameters
@@ -100,6 +110,14 @@ def create_trainer(
         "train_dataset": train_dataset,
         "eval_dataset": eval_dataset,
     }
+    if loss_mode == "completion" and "data_collator" in supported:
+        trainer_args["data_collator"] = DataCollatorForCompletionOnlyLM(
+            response_template="### Cypher:\n",
+            tokenizer=tokenizer,
+        )
+    elif loss_mode == "completion":
+        raise ValueError("This TRL version does not support completion-only loss.")
+
     if "processing_class" in supported:
         trainer_args["processing_class"] = tokenizer
     else:
@@ -119,6 +137,7 @@ def main() -> None:
     if args.max_train_samples is not None:
         sample_count = min(args.max_train_samples, len(dataset["train"]))
         dataset["train"] = dataset["train"].select(range(sample_count))
+    print(f"Using loss mode: {args.loss_mode}")
     tokenizer = load_tokenizer(args.model_name)
 
     model = AutoModelForCausalLM.from_pretrained(args.model_name, device_map=None)
@@ -139,6 +158,7 @@ def main() -> None:
         train_dataset=dataset["train"],
         eval_dataset=dataset["val"],
         training_config=training_config,
+        loss_mode=args.loss_mode,
     )
     trainer.train()
 

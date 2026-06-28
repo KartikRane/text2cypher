@@ -2,7 +2,7 @@ __pycache__/
 *.py[cod]
 .venv/
 .cache/
-final_model/
+final_model*/
 .env
 .env.*
 .agents/

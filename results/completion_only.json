@@ -1,0 +1,452 @@
+[
+  {
+    "question": "Which nodes are connected to UpdateDate where update_date is 2008-01-29, and also to another node?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nUpdateDate {update_date: DATE}",
+    "ground_truth": "MATCH (a:UpdateDate{update_date:'2008-01-29'})-[r]->(n), (n)-[s]->(m) RETURN labels(n) AS Interim, labels(m) AS Target",
+    "predicted": "MATCH (a:UpdateDate{update_date:'2008-01-29'})-[*]->(n) RETURN n.id, n.update_date AS update_date AS new_update_date AS new_update_date_copy AS new_update_date_copy, CONCAT(n.update_date) AS new_update_date, CONCAT(n.update_date) AS new_update_date) AS nodes_connected_to_UpdateDate WHERE nodes_connected_to_UpdateDate AND update_date = '2008-01-29' RETURN nodes_connected_to_UpdateDate; RETURN CONCAT(nodes_connected_to_UpdateDate) AS result_nodes ORDER BY nodes_connected_to_UpdateDate DESC LIMIT 1 RETURN result_nodes;  # 2 nodes are connected to UpdateDate where update_date is 2008-01-29, and also to another node.",
+    "exact_match": 0,
+    "token_f1": 0.12,
+    "structural_validity": 1
+  },
+  {
+    "question": "Find the streams that were created before 2018 and have more than 5,000 followers.",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (s:Stream) WHERE s.createdAt < datetime('2018-01-01T00:00:00.000000Z') AND s.followers > 5000 RETURN s",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "What are the top 5 tags used in questions with a score less than zero?",
+    "schema": "Node properties:\n- **Question**\n  - `favorites`: INTEGER Example: \"0\"\n  - `answered`: BOOLEAN \n  - `text`: STRING Example: \"### This is:  Bug    ### Specifications  OS: Win10\"\n  - `link`: STRING Example: \"https://stackoverflow.com/questions/62224586/playg\"\n  - `createdAt`: DATE_TIME Min: 2020-06-05T16:57:19Z, Max: 2020-06-05T21:49:16Z\n  - `title`: STRING Example: \"Playground is not loading with apollo-server-lambd\"\n  - `id`: INTEGER Min: 62220505, Max: 62224586\n  - `upVotes`: INTEGER Example: \"0\"\n  - `score`: INTEGER Example: \"-1\"\n  - `downVotes`: INTEGER Example: \"1\"\n- **Tag**\n  - `name`: STRING Example: \"aws-lambda\"\n- **User**\n  - `image`: STRING Example: \"https://lh3.googleusercontent.com/-NcFYSuXU0nk/AAA\"\n  - `link`: STRING Example: \"https://stackoverflow.com/users/10251021/alexandre\"\n  - `id`: INTEGER Min: 751, Max: 13681006\n  - `reputation`: INTEGER Min: 1, Max: 420137\n  - `display_name`: STRING Example: \"Alexandre Le\"\nRelationship properties:\n\nThe relationships:\n(:Question)-[:TAGGED]->(:Tag)\n(:User)-[:ASKED]->(:Question)",
+    "ground_truth": "MATCH (q:Question)-[:TAGGED]->(t:Tag) WHERE q.score < 0 RETURN t.name, count(q) AS usage ORDER BY usage DESC LIMIT 5",
+    "predicted": "MATCH (u:User)-[:ASKED]->(q:Question) WHERE q.score < 0 RETURN u.name, u.title, u.upVotes, u.downVotes, u.score ORDER BY u.score DESC LIMIT 5 RETURN u.name, u.title, u.upVotes, u.downVotes, u.downVotes) WHERE u.name NOT IN (SELECT name FROM Questions WHERE q.name = u.name) RETURN u.name, u.title, u.upVotes, u.downVotes, u.downVotes ORDER BY u.downVotes DESC LIMIT 5 RETURN u.title, u.upVotes, u.downVotes, u.downVotes) RETURN m.user AS user, m.name AS user_name, m.user_id AS user_id, m.user_link AS user_user_link, m.user AS user_user_user_user_user_name AS user_user_user_user_name AS user_user_user_user_user_name AS user_user_user_user_",
+    "exact_match": 0,
+    "token_f1": 0.4210526315789473,
+    "structural_validity": 1
+  },
+  {
+    "question": "List the labels of users with an area less than 2 and a size greater than 1.",
+    "schema": "Node properties:\n- **User**\n  - `label`: STRING Example: \"inchristbl.bsky.social\"\n  - `key`: STRING Example: \"0\"\n  - `y`: FLOAT Example: \"6000.659\"\n  - `color`: STRING Example: \"#3CB371\"\n  - `x`: FLOAT Example: \"-4383.217\"\n  - `area`: FLOAT Example: \"2.6\"\n  - `size`: FLOAT Example: \"1.82\"\nRelationship properties:\n- **INTERACTED**\n  - `weight: INTEGER` Example: \"1\"\n  - `ogWeight: INTEGER` Example: \"1\"\n  - `size: FLOAT` Example: \"0.2\"\n  - `key: STRING` Example: \"geid_68_0\"\nThe relationships:\n(:User)-[:INTERACTED]->(:User)",
+    "ground_truth": "MATCH (u:User) WHERE u.area < 2 AND u.size > 1 RETURN u.label",
+    "predicted": "MATCH (u:User) WHERE u.area < 2 AND u.size > 1 RETURN u.label AS labels, u.key AS labels AS labels ORDER BY labels DESC LIMIT 1 RETURN labels MATCH (u)-[:INTERACTED]->(:User) WITH u, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels, labels,",
+    "exact_match": 0,
+    "token_f1": 0.6857142857142856,
+    "structural_validity": 1
+  },
+  {
+    "question": "Find the title and the comments for those Article where title starts with O!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {title: STRING}\nArticle {comments: STRING}",
+    "ground_truth": "MATCH (n:Article) WHERE n.title STARTS WITH 'O' RETURN n.title AS title, n.comments AS comments",
+    "predicted": "MATCH (n:Article) WHERE n.title STARTS WITH 'O' RETURN n.title AS title, n.comments AS comments RETURN title, n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS comments RETURN n.title AS comments AS",
+    "exact_match": 0,
+    "token_f1": 1.0,
+    "structural_validity": 1
+  },
+  {
+    "question": "Identify streams that have moderators who are also VIPs.",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (s:Stream)<-[:MODERATOR]-(m:User)-[:VIP]->(s) RETURN s.name AS stream, m.name AS moderator_and_vip",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "What are the names and ages of editors?",
+    "schema": "{\"Editor\": {\"count\": 9, \"labels\": [], \"properties\": {\"Name\": {\"unique\": false, \"indexed\": false, \"type\": \"STRING\", \"existence\": false}, \"Age\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Editor_ID\": {\"unique\": false, \"indexed\": false, \"type\": \"INTEGER\", \"existence\": false}}, \"type\": \"node\", \"relationships\": {\"EDited_BY\": {\"count\": 7, \"direction\": \"in\", \"labels\": [\"Journal\"], \"properties\": {\"Work_Type\": {\"indexed\": false, \"type\": \"STRING\", \"existence\": false, \"array\": false}}}}}, \"Journal\": {\"count\": 16, \"labels\": [], \"properties\": {\"Sales\": {\"unique\": false, \"indexed\": false, \"type\": \"INTEGER\", \"existence\": false}, \"Theme\": {\"unique\": false, \"indexed\": false, \"type\": \"STRING\", \"existence\": false}, \"Date\": {\"unique\": false, \"indexed\": false, \"type\": \"STRING\", \"existence\": false}, \"Journal_ID\": {\"unique\": false, \"indexed\": false, \"type\": \"INTEGER\", \"existence\": false}}, \"type\": \"node\", \"relationships\": {\"EDited_BY\": {\"count\": 0, \"direction\": \"out\", \"labels\": [\"Editor\"], \"properties\": {\"Work_Type\": {\"indexed\": false, \"type\": \"STRING\", \"existence\": false, \"array\": false}}}}}, \"EDited_BY\": {\"count\": 7, \"properties\": {\"Work_Type\": {\"indexed\": false, \"type\": \"STRING\", \"existence\": false, \"array\": false}}, \"type\": \"relationship\"}}",
+    "ground_truth": "MATCH (e:Editor) RETURN e.Name, e.Age",
+    "predicted": "MATCH (e:Editor) RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age ORDER BY e.Age DESC LIMIT 1 RETURN e.Name, e.Age",
+    "exact_match": 0,
+    "token_f1": 0.6666666666666666,
+    "structural_validity": 1
+  },
+  {
+    "question": "Fetch the distinct values of the report_id from Report where either report_no is none provided or report_id is not null!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nReport {report_no: STRING}\nReport {report_id: STRING}",
+    "ground_truth": "MATCH (n:Report) WHERE n.report_no = 'none provided' OR n.report_id IS NOT NULL RETURN DISTINCT n.report_id AS report_id",
+    "predicted": "MATCH (n:Report) WHERE n.report_no = 'none' OR n.report_id IS NOT NULL RETURN DISTINCT n.report_id AS report_id AS copy_id ORDER BY copy_id DESC LIMIT 1) RETURN copy_id, copy_id AS copy_id AS copy_id AS copy_id AS new_copy_id WHERE copy_id IS NOT NULL RETURN copy_id AS copy_id AS copy_id AS copy_id AS new_copy_id RETURN copy_id AS copy_id AS copy_id AS copy_id AS new_copy_id) AS records ORDER BY records DESC LIMIT 1 LIMIT 1 RETURN records ORDER BY records DESC LIMIT 1 LIMIT 1 MATCH (n:Report) WHERE n.report_no = 'none' OR n.report_id IS NOT NULL RETURN DISTINCT n.report_id AS report_id AS copy_id ORDER BY copy_id DESC LIMIT 1) RETURN records ORDER BY records DESC LIMIT 1 LIMIT 1 MATCH (n:Report) WHERE n.report_no = 'none'",
+    "exact_match": 0,
+    "token_f1": 0.6666666666666667,
+    "structural_validity": 1
+  },
+  {
+    "question": "Search for the article_id values from 20 Article that are linked to Journal via PUBLISHED_IN with pages = 537-560, and return article_id along with the respective Journal counts!",
+    "schema": "Relevant node labels and their properties (with datatypes) are:\nArticle {article_id: INTEGER}\nJournal {}\n\nRelevant relationships are:\n{'start': Article, 'type': PUBLISHED_IN, 'end': Journal }\n\n\nRelevant relationship properties (with datatypes) are:\nPUBLISHED_IN {pages: STRING}",
+    "ground_truth": "MATCH (n:Article) -[r:PUBLISHED_IN]->(m:Journal) WHERE r.pages='537-560' WITH DISTINCT n, m RETURN n.article_id AS article_id, count(m) AS count LIMIT 20",
+    "predicted": "MATCH (n:Article) -[r:PUBLISHED_IN]->(m:Journal) WHERE r.pages = '537-560' RETURN n.article_id, m.article_count AS article_count AS article_id AS article_id AS records ORDER BY article_id DESC LIMIT 1) RETURN records AS records AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results AS results",
+    "exact_match": 0,
+    "token_f1": 0.37837837837837834,
+    "structural_validity": 1
+  },
+  {
+    "question": "What are the total view counts for streams that have moderators?",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (s:Stream) WHERE exists{(s)-[:MODERATOR]->()} RETURN sum(s.total_view_count) AS totalViewCountForModeratedStreams",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "Is there a path connecting Report where report_id is 3fa3ec8100d88908b00d139dacdedb6a and UpdateDate, for which update_date is 2014-11-11?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nReport {report_id: STRING}\nUpdateDate {update_date: DATE}",
+    "ground_truth": "MATCH (a:Report{report_id:'3fa3ec8100d88908b00d139dacdedb6a'}), (b:UpdateDate{update_date:'2014-11-11'}) RETURN EXISTS((a)-[*]-(b)) AS pathExists",
+    "predicted": "MATCH (a:Report{report_id:'3fa3ec8100d88908b00d139dacdedb6a'})-[*]->(d:UpdateDate{update_date:'2014-11-11'}) RETURN EXISTS((a)-[*]->(d)) AS pathExists, pathExists WHERE pathExists RETURN EXISTS(EXISTS(EXISTS(MATCH (n:NodeLabel)[:report_id]->{report_id:'3fa3ec8100d88908b00d139dacdedb6a'})-[*]->(d))orevert)) RETURN pathExists LIMIT 1 EXTERNALize pathExists RETURN pathExists EXists() RETURN pathExists AS pathExists, pathExists AS pathExists WHERE pathExists LIMIT 1 EXTERNALize pathExists RETURN pathExists RETURN pathExists LIMIT 1 EXTERNALize pathExists RETURN pathExists LIMIT 1 EXTERNALize pathExists RETURN path",
+    "exact_match": 0,
+    "token_f1": 0.36363636363636365,
+    "structural_validity": 1
+  },
+  {
+    "question": "How many nodes are connected to Journal for which name is J. Number Theory, by exactly two different types of relationships?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nJournal {name: STRING}",
+    "ground_truth": "MATCH (a:Journal{name:'J. Number Theory'})-[r]->(n) WITH n, COLLECT(DISTINCT TYPE(r)) AS Types WHERE SIZE(Types) = 2 RETURN COUNT(n)",
+    "predicted": "MATCH (a:Journal{name:'Number Theory'})-[r]->(n) WHERE ANY(i=>2) RETURN count(n) AS nCount LIMIT 1 RETURN count(r) AS nodesCount LIMIT 1 RETURN nCount AS nodesCount RETURN nCount AS nodesCount LIMIT 1 RETURN count(r) AS nodesCount LIMIT 1 RETURN count(r) AS nodesCount LIMIT 1 RETURN count(r) AS nodesCount LIMIT 1 RETURN count(r) AS nodesCount LIMIT 1 RETURN count(r) AS nodesCount LIMIT 1 RETURN count(r) AS nodesCount LIMIT 1 RETURN count(r) AS nodesCount LIMIT 1 RETURN count(m) AS nodesMATCH (n:Node) WHERE n.name = 'J. Number Theory' AND n.type = 'Relationship' RETURN nCount, count(r) AS nodesCount RETURN count(r) AS nodesCount LIMIT 1 RETURN count(m) AS nodesMATCH (n:Node) WHERE n.name = 'J. Number Theory' AND n.type = 'Relationship' RETURN count(m) AS nodesCount",
+    "exact_match": 0,
+    "token_f1": 0.34146341463414637,
+    "structural_validity": 1
+  },
+  {
+    "question": "Find the DOI for which name is 10.1016/S0393-0440(00)00003-6!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nDOI {name: STRING}",
+    "ground_truth": "MATCH (n:DOI {name:'10.1016/S0393-0440(00)00003-6'}) RETURN n",
+    "predicted": "MATCH (n:DOI) WHERE n.name = '10.1016/S0393-0440(00)00003-6' RETURN n.name AS DOI UNION MATCH (m:DOI) WHERE m.name = '10.1016/S0393-0440(00)00003-6' RETURN m.name AS DOI UNION MATCH (n:DOI) WHERE n.name = '10.1016/S0393-0440(00)00003-6' RETURN n.name AS DOI UNION MATCH (m:DOI) WHERE m.name = '10.1016/S0393-0440(00)00003-6' RETURN m.name AS DOI UNION MATCH (n:DOI) WHERE n.name = '10.1016/S0393-0440(00)00003-6'",
+    "exact_match": 0,
+    "token_f1": 0.23529411764705882,
+    "structural_validity": 1
+  },
+  {
+    "question": "List the roles played by actors in the first 3 movies directed by Nancy Meyers.",
+    "schema": "Node properties:\n- **Movie**\n  - `title`: STRING Example: \"The Matrix\"\n  - `votes`: INTEGER Min: 1, Max: 5259\n  - `tagline`: STRING Example: \"Welcome to the Real World\"\n  - `released`: INTEGER Min: 1975, Max: 2012\n- **Person**\n  - `born`: INTEGER Min: 1929, Max: 1996\n  - `name`: STRING Example: \"Keanu Reeves\"\nRelationship properties:\n- **ACTED_IN**\n  - `roles: LIST` Min Size: 1, Max Size: 6\n- **REVIEWED**\n  - `summary: STRING` Available options: ['Pretty funny at times', 'A solid romp', 'Silly, but fun', 'You had me at Jerry', 'An amazing journey', 'Slapstick redeemed only by the Robin Williams and ', 'Dark, but compelling', 'The coolest football movie ever', 'Fun, but a little far fetched']\n  - `rating: INTEGER` Min: 45, Max:  100\nThe relationships:\n(:Person)-[:ACTED_IN]->(:Movie)\n(:Person)-[:DIRECTED]->(:Movie)\n(:Person)-[:PRODUCED]->(:Movie)\n(:Person)-[:WROTE]->(:Movie)\n(:Person)-[:FOLLOWS]->(:Person)\n(:Person)-[:REVIEWED]->(:Movie)",
+    "ground_truth": "MATCH (director:Person {name: \"Nancy Meyers\"})-[:DIRECTED]->(movie:Movie) WITH movie ORDER BY movie.released LIMIT 3 MATCH (actor:Person)-[actedIn:ACTED_IN]->(movie) RETURN movie.title AS MovieTitle, actor.name AS ActorName, actedIn.roles AS Roles",
+    "predicted": "MATCH (p:Person)-[:ACTED_IN]->(m:Movie) WHERE p.name = 'Nancy Meyers' RETURN m.role, m.title ORDER BY m.title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title DESC LIMIT 3 RETURN m.title AS title ORDER BY title D",
+    "exact_match": 0,
+    "token_f1": 0.358974358974359,
+    "structural_validity": 1
+  },
+  {
+    "question": "Search for the journal_id in Journal that is linked through a PUBLISHED_IN relationship with Article where title is Classification of Subsystems for Local Nets with Trivial Superselection\n  Structure and PUBLISHED_IN has meta on 217!",
+    "schema": "Relevant node labels and their properties (with datatypes) are:\nArticle {title: STRING}\nJournal {journal_id: STRING}\n\nRelevant relationships are:\n{'start': Article, 'type': PUBLISHED_IN, 'end': Journal }\n\n\nRelevant relationship properties (with datatypes) are:\nPUBLISHED_IN {meta: STRING}",
+    "ground_truth": "MATCH (n:Article) -[pu:PUBLISHED_IN {meta : '217'}]->(m) WHERE n.title='Classification of Subsystems for Local Nets with Trivial Superselection   Structure' RETURN m.journal_id",
+    "predicted": "MATCH (n:Article {title: 'Classification of Subsystems for Local Nets with Trivial Superselection'}) -[r:PUBLISHED_IN]->(m:Journal) WHERE m.journal_id = '217' RETURN n.journal_id AS journal_id, m.title AS description ORDER BY description DESC LIMIT 1 RETURN journal_id, description ORDER BY description DESC LIMIT 1 LIMIT m.journal_id LIMIT m.journal_id) RETURN journal_id, m.journal_id ORDER BY description DESC LIMIT m.journal_id LIMIT m.journal_id RETURN m.journal_id AS journal_id, m.title AS description ORDER BY description DESC LIMIT m.journal_id LIMIT m.journal_id) RETURN m.journal_id, m.title AS description ORDER BY description DESC LIMIT m.journal_id LIMIT m.journal_id LIMIT m.journal_id RETURN m.journal_id AS journal_id, m.title AS description ORDER BY description DESC LIMIT m.journal_id LIMIT m.journal_id LIMIT m.journal_id RETURN m.journal",
+    "exact_match": 0,
+    "token_f1": 0.44000000000000006,
+    "structural_validity": 1
+  },
+  {
+    "question": "Which nodes have a common property with Article where article_id is 2007 and are PUBLISHED_IN linked to a Journal?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {article_id: INTEGER}\nJournal {}\n\nRelevant relationships are:\n{'start': Article, 'type': PUBLISHED_IN, 'end': Journal }",
+    "ground_truth": "MATCH (a:Article {article_id:'2007'})-[r:PUBLISHED_IN]->(b:Journal) WHERE ANY(key IN keys(a) WHERE a[key] = b[key]) RETURN b",
+    "predicted": "MATCH (n:Article) -[:PUBLISHED_IN]->(m:Journal) WHERE n.article_id = '2007' RETURN n.key, m.article_id ORDER BY n.article_id DESC LIMIT 2 RETURN m.key, m.article_id ORDER BY n.article_id DESC LIMIT 2 RETURN m.key ORDER BY n.article_id DESC LIMIT 2 RETURN m.key MATCH (n:Article) -[:PUBLISHED_IN]->(m:Journal) RETURN n.key, m.article_id ORDER BY n.article_id DESC LIMIT 2 RETURN m.key, m.article_id ORDER BY n.article_id DESC LIMIT 2 RETURN m.key MATCH (n:Article) -[:PUBLISHED_IN]->(m:Journal) RETURN n.key, m.article_id ORDER BY n.article_id DESC LIMIT 2 RETURN m.key, m.article_id ORDER BY n.article_id DESC LIMIT 2 RETURN m.key",
+    "exact_match": 0,
+    "token_f1": 0.27586206896551724,
+    "structural_validity": 1
+  },
+  {
+    "question": "How many editors are there?",
+    "schema": "{\"Editor\": {\"count\": 9, \"labels\": [], \"properties\": {\"Name\": {\"unique\": false, \"indexed\": false, \"type\": \"STRING\", \"existence\": false}, \"Age\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Editor_ID\": {\"unique\": false, \"indexed\": false, \"type\": \"INTEGER\", \"existence\": false}}, \"type\": \"node\", \"relationships\": {\"EDited_BY\": {\"count\": 7, \"direction\": \"in\", \"labels\": [\"Journal\"], \"properties\": {\"Work_Type\": {\"indexed\": false, \"type\": \"STRING\", \"existence\": false, \"array\": false}}}}}, \"Journal\": {\"count\": 16, \"labels\": [], \"properties\": {\"Sales\": {\"unique\": false, \"indexed\": false, \"type\": \"INTEGER\", \"existence\": false}, \"Theme\": {\"unique\": false, \"indexed\": false, \"type\": \"STRING\", \"existence\": false}, \"Date\": {\"unique\": false, \"indexed\": false, \"type\": \"STRING\", \"existence\": false}, \"Journal_ID\": {\"unique\": false, \"indexed\": false, \"type\": \"INTEGER\", \"existence\": false}}, \"type\": \"node\", \"relationships\": {\"EDited_BY\": {\"count\": 0, \"direction\": \"out\", \"labels\": [\"Editor\"], \"properties\": {\"Work_Type\": {\"indexed\": false, \"type\": \"STRING\", \"existence\": false, \"array\": false}}}}}, \"EDited_BY\": {\"count\": 7, \"properties\": {\"Work_Type\": {\"indexed\": false, \"type\": \"STRING\", \"existence\": false, \"array\": false}}, \"type\": \"relationship\"}}",
+    "ground_truth": "MATCH (e:Editor) RETURN COUNT(e)",
+    "predicted": "MATCH (e:Editor) RETURN count(e) AS editors, count(e) AS total_entries WHERE e.count() > 0 RETURN count(e) AS count_entries, count(e) AS total_entries AS total_entries_count AS total_entries_count AS total_entries AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS entries_count AS",
+    "exact_match": 0,
+    "token_f1": 0.3333333333333333,
+    "structural_validity": 1
+  },
+  {
+    "question": "Identify characters who belong to community 579.",
+    "schema": "Node properties:\n- **Character**\n  - `centrality`: FLOAT Min: 0.0, Max: 1.0\n  - `book45PageRank`: FLOAT Min: 0.15000000000000002, Max: 11.409916274911177\n  - `fastrf_embedding`: LIST Min Size: 10, Max Size: 10\n  - `book1BetweennessCentrality`: FLOAT Min: 0.0, Max: 4638.53495125504\n  - `book1PageRank`: FLOAT Min: 0.15000000000000002, Max: 8.164174336296284\n  - `louvain`: INTEGER Min: 0, Max: 10\n  - `community`: INTEGER Min: 504, Max: 795\n  - `degree`: FLOAT Min: 0.0, Max: 300.0\n  - `name`: STRING Example: \"Addam-Marbrand\"\n  - `pagerank`: FLOAT Min: 0.15000000000000002, Max: 9.473142454730429\nRelationship properties:\n- **INTERACTS**\n  - `weight: INTEGER` Min: 3, Max:  334\n- **INTERACTS1**\n  - `weight: INTEGER` Min: 3, Max:  291\n  - `book: INTEGER` Min: 1, Max:  1\n- **INTERACTS2**\n  - `weight: INTEGER` Min: 3, Max:  92\n  - `book: INTEGER` Min: 2, Max:  2\n- **INTERACTS3**\n  - `weight: INTEGER` Min: 3, Max:  95\n  - `book: INTEGER` Min: 3, Max:  3\n- **INTERACTS45**\n  - `weight: INTEGER` Min: 3, Max:  96\n  - `book: INTEGER` Min: 45, Max:  45\nThe relationships:\n(:Character)-[:INTERACTS45]->(:Character)\n(:Character)-[:INTERACTS]->(:Character)\n(:Character)-[:INTERACTS1]->(:Character)\n(:Character)-[:INTERACTS3]->(:Character)\n(:Character)-[:INTERACTS2]->(:Character)",
+    "ground_truth": "MATCH (c:Character) WHERE c.community = 579 RETURN c",
+    "predicted": "`weight: INTEGER` Min: 3, Max:  10\n  - `book: INTEGER` Min: 1, Max:  1\n- **INTERACTS45PageRank**\n  - `weight: INTEGER` Min: 3, Max:  1, Min Size: 10\n  - `book: INTEGER` Min Size: 1, Max Size: 10\n  - `fastrf_embedding`: LIST Min Size: 10, Max Size: 10\n  - `book1BetweennessCentrality`: FLOAT Min Size: 0.0, Max Size: 4638.53495125504\n  - `book1PageRank`: FLOAT Min Size: 0.15000000000000002, Max Size: 8.164174336296284\n  - `louvain`: INTEGER Min: 0, Max: 10\n  - `community`: INTEGER Min: 504, Max: 795\n  - `degree`: FLO",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "What is the total number of questions asked by users with a reputation greater than the average reputation of all users?",
+    "schema": "Node properties:\n- **Question**\n  - `favorites`: INTEGER Example: \"0\"\n  - `answered`: BOOLEAN \n  - `text`: STRING Example: \"### This is:  Bug    ### Specifications  OS: Win10\"\n  - `link`: STRING Example: \"https://stackoverflow.com/questions/62224586/playg\"\n  - `createdAt`: DATE_TIME Min: 2020-06-05T16:57:19Z, Max: 2020-06-05T21:49:16Z\n  - `title`: STRING Example: \"Playground is not loading with apollo-server-lambd\"\n  - `id`: INTEGER Min: 62220505, Max: 62224586\n  - `upVotes`: INTEGER Example: \"0\"\n  - `score`: INTEGER Example: \"-1\"\n  - `downVotes`: INTEGER Example: \"1\"\n- **Tag**\n  - `name`: STRING Example: \"aws-lambda\"\n- **User**\n  - `image`: STRING Example: \"https://lh3.googleusercontent.com/-NcFYSuXU0nk/AAA\"\n  - `link`: STRING Example: \"https://stackoverflow.com/users/10251021/alexandre\"\n  - `id`: INTEGER Min: 751, Max: 13681006\n  - `reputation`: INTEGER Min: 1, Max: 420137\n  - `display_name`: STRING Example: \"Alexandre Le\"\nRelationship properties:\n\nThe relationships:\n(:Question)-[:TAGGED]->(:Tag)\n(:User)-[:ASKED]->(:Question)",
+    "ground_truth": "MATCH (u:User) WITH avg(u.reputation) AS averageReputation MATCH (u:User)-[:ASKED]->(q:Question) WHERE u.reputation > averageReputation RETURN count(DISTINCT q) AS questionCount",
+    "predicted": "MATCH (u:User)-[:ASKED]->(q:Question) WHERE q.reputation > CONTAINS(AVG(q.reputation)) RETURN count(q) AS n, count(q) AS n_q ORDER BY n DESC LIMIT 1, 1) AS answers AS answers MATCH (u:User)-[:ASKED]->(q:Question) WHERE q.reputation > CONTAINS(AVG(q.reputation)) RETURN count(q) AS n, count(q) AS n_q ORDER BY n DESC LIMIT 1, 1) AS answers MATCH (u:User)-[:ASKED]->(q:Question) WHERE q.reputation > CONTAINS(AVG(q.reputation)) RETURN count(q) AS n, count(q) AS n_q ORDER BY n DESC LIMIT 1, 1) AS answers MATCH (u:User)-[:ASKED]->(q:Question) WHERE q.reputation > CONTAINS(AVG(q.reputation)) RETURN count(q) AS n, count",
+    "exact_match": 0,
+    "token_f1": 0.3529411764705882,
+    "structural_validity": 1
+  },
+  {
+    "question": "Is there a path connecting Author where first_name is Bernhard and Topic, for which description is Focusing on techniques and concepts related to transformations, solutions, and properties of linear equations and matrices, including Jordan normal form, eigenvalues, eigenvectors, diagonalization, and eigenformulations.?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nAuthor {first_name: STRING}\nTopic {description: STRING}",
+    "ground_truth": "MATCH (a:Author{first_name:'Bernhard'}), (b:Topic{description:'Focusing on techniques and concepts related to transformations, solutions, and properties of linear equations and matrices, including Jordan normal form, eigenvalues, eigenvectors, diagonalization, and eigenformulations.'}) RETURN EXISTS((a)-[*]-(b)) AS pathExists",
+    "predicted": "MATCH (a:Author{first_name:'Bernhard'})-[*]->(d:Topic{description:'Focusing on transformations, solutions, and properties of linear equations and matrices, including Jordan normal form, eigenvalues, eigenforms, diagonalization, and eigenformulations'}) RETURN EXISTS(SELECT * FROM paths(d)) AS pathExists WHERE pathExists RETURN EXISTS(SELECT * FROM paths(a)) AS pathExists RETURN EXISTS(SELECT * FROM paths(d)) AS pathExists RETURN EXISTS(SELECT * FROM paths(pathExists)) AS pathExists RETURN EXISTS(SELECT * FROM paths(pathExists)) AS pathExists RETURN EXISTS(SELECT * FROM paths(pathExists)) AS pathExists RETURN EXISTS(SELECT * FROM paths(pathExists)) AS pathExists RETURN EXISTS(SELECT * FROM paths(pathExists)) AS pathExists RETURN EXISTS(SELECT * FROM paths(pathExists)) AS pathExists RETURN EXISTS(SELECT * FROM paths(pathExists)) AS pathExists RETURN EXISTS(SELECT * FROM",
+    "exact_match": 0,
+    "token_f1": 0.6666666666666666,
+    "structural_validity": 1
+  },
+  {
+    "question": "List the types of relationships and their counts connected to Article for which comments is Published by Geometry and Topology at\n  http://www.maths.warwick.ac.uk/gt/GTVol4/paper14.abs.html!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {comments: STRING}",
+    "ground_truth": "MATCH (a:Article{comments:'Published by Geometry and Topology at   http://www.maths.warwick.ac.uk/gt/GTVol4/paper14.abs.html'})-[r]->() RETURN TYPE(r) AS Relations, COUNT(r) AS Counts",
+    "predicted": "MATCH (a:Article{comments:'Published by Geometry and Topology at http://www.maths.warwick.ac.uk/gt/GTVol4/paper14.abs.html'})-[r]->(n) RETURN TYPE(r) AS Type, COUNT(TYPE(r)) AS Count, TYPE(n) AS Name, TYPE(r) AS Type, TYPE(comments) AS Type, TYPE(comments) AS Name, TYPE(comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments) AS Name, TYPE(Comments) AS Type, TYPE(Comments",
+    "exact_match": 0,
+    "token_f1": 0.6060606060606061,
+    "structural_validity": 1
+  },
+  {
+    "question": "How many gymnasts are there?",
+    "schema": "{\"Gymnast\": {\"count\": 7, \"labels\": [], \"properties\": {\"Pommel_Horse_Points\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Rings_Points\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Floor_Exercise_Points\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Gymnast_ID\": {\"unique\": false, \"indexed\": false, \"type\": \"INTEGER\", \"existence\": false}, \"Vault_Points\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Total_Points\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Parallel_Bars_Points\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Horizontal_Bar_Points\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}}, \"type\": \"node\", \"relationships\": {}}, \"Person\": {\"count\": 10, \"labels\": [], \"properties\": {\"Name\": {\"unique\": false, \"indexed\": false, \"type\": \"STRING\", \"existence\": false}, \"Age\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Height\": {\"unique\": false, \"indexed\": false, \"type\": \"FLOAT\", \"existence\": false}, \"Hometown\": {\"unique\": false, \"indexed\": false, \"type\": \"STRING\", \"existence\": false}, \"People_ID\": {\"unique\": false, \"indexed\": false, \"type\": \"INTEGER\", \"existence\": false}}, \"type\": \"node\", \"relationships\": {}}}",
+    "ground_truth": "MATCH (n:Gymnast) RETURN count(n)",
+    "predicted": "MATCH (g:Gymnast) RETURN count(g) AS count_gymnasts, LIMIT 1, 20 ORDER BY count_gymnasts DESC LIMIT 1, 20) RETURN count_gymnasts, count(g) AS count_gymnasts, LIMIT 1, 20 ORDER BY count_gymnasts DESC LIMIT 1, 20) AS count_gymnasts, count(g) AS count_gymnasts, LIMIT 1, 20 ORDER BY count_gymnasts DESC LIMIT 1, 20) RETURN count(g) AS count_gymnasts, count(g) AS count_gymnasts, LIMIT 1, 20 ORDER BY count_gymnasts DESC LIMIT 1, 20) AS count_gymnasts, count(g) AS count_gymnasts, LIMIT 1, 20 ORDER BY count_gymnasts DESC LIMIT 1, 20) RETURN count(g) AS count_gymnasts, count",
+    "exact_match": 0,
+    "token_f1": 0.2105263157894737,
+    "structural_validity": 1
+  },
+  {
+    "question": "Find the question with the least number of upvotes and a score greater than the average score of questions tagged with 'aws-lambda'.",
+    "schema": "Node properties:\n- **Question**\n  - `favorites`: INTEGER Example: \"0\"\n  - `answered`: BOOLEAN \n  - `text`: STRING Example: \"### This is:  Bug    ### Specifications  OS: Win10\"\n  - `link`: STRING Example: \"https://stackoverflow.com/questions/62224586/playg\"\n  - `createdAt`: DATE_TIME Min: 2020-06-05T16:57:19Z, Max: 2020-06-05T21:49:16Z\n  - `title`: STRING Example: \"Playground is not loading with apollo-server-lambd\"\n  - `id`: INTEGER Min: 62220505, Max: 62224586\n  - `upVotes`: INTEGER Example: \"0\"\n  - `score`: INTEGER Example: \"-1\"\n  - `downVotes`: INTEGER Example: \"1\"\n- **Tag**\n  - `name`: STRING Example: \"aws-lambda\"\n- **User**\n  - `image`: STRING Example: \"https://lh3.googleusercontent.com/-NcFYSuXU0nk/AAA\"\n  - `link`: STRING Example: \"https://stackoverflow.com/users/10251021/alexandre\"\n  - `id`: INTEGER Min: 751, Max: 13681006\n  - `reputation`: INTEGER Min: 1, Max: 420137\n  - `display_name`: STRING Example: \"Alexandre Le\"\nRelationship properties:\n\nThe relationships:\n(:Question)-[:TAGGED]->(:Tag)\n(:User)-[:ASKED]->(:Question)",
+    "ground_truth": "MATCH (t:Tag {name: 'aws-lambda'})<-[:TAGGED]-(q:Question) WITH avg(q.score) AS average_score MATCH (q:Question) WHERE q.score > average_score WITH q ORDER BY q.upVotes ASC RETURN q LIMIT 1",
+    "predicted": "MATCH (q:Question) WHERE q.upVotes < (q.averageScore) ORDER BY q.downVotes DESC LIMIT 1 LIMIT 1 RETURN q.name AS name, q.score AS score ORDER BY q.downVotes DESC LIMIT 1 LIMIT 1 RETURN q.name AS name, q.score AS score ORDER BY q.downVotes DESC LIMIT 1 LIMIT 1 RETURN q.name AS name, q.score AS score ORDER BY q.downVotes DESC LIMIT 1 LIMIT 1 RETURN q.name AS name, q.score AS score ORDER BY q.downVotes DESC LIMIT 1 LIMIT 1 RETURN q.name AS name, q.score AS score ORDER BY q.downVotes DESC LIMIT 1 LIMIT 1 RETURN q.name AS name, q.score AS score ORDER BY q.downVotes DESC LIMIT 1 LIMIT 1 RETURN q.name AS name, q.score AS score ORDER BY q.downVotes DESC LIMIT 1 LIMIT 1 RETURN q.name AS name, q.score AS score ORDER BY q",
+    "exact_match": 0,
+    "token_f1": 0.6153846153846154,
+    "structural_validity": 1
+  },
+  {
+    "question": "Are there any nodes that are connected with Report where report_no is none provided and share a common property with DOI, for which name equals 10.1016/S0040-9383(00)00015-X?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nReport {report_no: STRING}\nDOI {name: STRING}",
+    "ground_truth": "MATCH (a:Report{report_no:'none provided'})-[r]->(n), (d:DOI{name:'10.1016/S0040-9383(00)00015-X'}) WHERE ANY(key in keys(n) WHERE n[key] = d[key]) RETURN n",
+    "predicted": "MATCH (a:Report{report_no:'10.1016/S0040-9383(00)00015-X'})-[*]->(n) RETURN EXISTS( SELECT p FROM n WHERE p.report_no IS NOT NULL OR p.report_no IS NOT NULL OR p.report_no IS NOT NULL AND p.name = '10.1016/S0040-9383(00)00015-X') AS nodes WHERE nodes.name IS NOT NULL RETURN nodes RETURN EXISTS( SELECT p FROM n WHERE p.report_no IS NOT NULL OR p.report_no IS NOT NULL AND p.report_no IS NOT NULL AND p.name = '10.1016/S0040-9383(00)00015-X')  AS nodes RETURN EXISTS( SELECT p FROM n WHERE p.report_no IS NOT NULL OR p.report_no IS NOT NULL AND p.report_no IS NOT NULL AND p.name = '10.",
+    "exact_match": 0,
+    "token_f1": 0.2857142857142857,
+    "structural_validity": 1
+  },
+  {
+    "question": "List the movies that have been both directed and produced by the same person.",
+    "schema": "Node properties:\n- **Movie**\n  - `title`: STRING Example: \"The Matrix\"\n  - `votes`: INTEGER Min: 1, Max: 5259\n  - `tagline`: STRING Example: \"Welcome to the Real World\"\n  - `released`: INTEGER Min: 1975, Max: 2012\n- **Person**\n  - `born`: INTEGER Min: 1929, Max: 1996\n  - `name`: STRING Example: \"Keanu Reeves\"\nRelationship properties:\n- **ACTED_IN**\n  - `roles: LIST` Min Size: 1, Max Size: 6\n- **REVIEWED**\n  - `summary: STRING` Available options: ['Pretty funny at times', 'A solid romp', 'Silly, but fun', 'You had me at Jerry', 'An amazing journey', 'Slapstick redeemed only by the Robin Williams and ', 'Dark, but compelling', 'The coolest football movie ever', 'Fun, but a little far fetched']\n  - `rating: INTEGER` Min: 45, Max:  100\nThe relationships:\n(:Person)-[:ACTED_IN]->(:Movie)\n(:Person)-[:DIRECTED]->(:Movie)\n(:Person)-[:PRODUCED]->(:Movie)\n(:Person)-[:WROTE]->(:Movie)\n(:Person)-[:FOLLOWS]->(:Person)\n(:Person)-[:REVIEWED]->(:Movie)",
+    "ground_truth": "MATCH (p:Person)-[:DIRECTED]->(m:Movie)<-[:PRODUCED]-(p) RETURN m.title AS movie",
+    "predicted": "MATCH (m:Person)-[:DIRECTED]->(m:Movie) WHERE m.name = 'Keanu Reeves' RETURN m.title, m.released, m.tags ORDER BY m.tags DESC LIMIT 1 RETURN m.title, m.tags ORDER BY m.tags DESC LIMIT 1 LIMIT 1 RETURN m.title, m.tags ORDER BY m.tags DESC LIMIT 1 LIMIT 1 RETURN m.title, m.tags ORDER BY m.tags DESC LIMIT 1 LIMIT 1 LIMIT 1 RETURN m.title, m.tags ORDER BY m.tags DESC LIMIT 1 LIMIT 1 LIMIT 1 RETURN m.title, m.tags ORDER BY m.tags DESC LIMIT 1 LIMIT 1 LIMIT 1 RETURN m.title, m.tags ORDER BY m.tags DESC LIMIT 1 LIMIT 1 LIMIT 1 RETURN m.title, m.tags ORDER BY m.tags DESC LIMIT 1 LIMIT 1 LIMIT 1 RETURN m.title, m.tags ORDER BY m.tags DESC LIMIT 1 LIMIT 1 LIMIT",
+    "exact_match": 0,
+    "token_f1": 0.18181818181818182,
+    "structural_validity": 1
+  },
+  {
+    "question": "Which streams are moderated by users who are also VIPs in the same stream?",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (s:Stream)<-[:MODERATOR]-(u:User)-[:VIP]->(s) RETURN s.name AS stream_name, u.name AS moderator_vip_name",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "Find abstract of the Article and return it along with the count of Journal that are linked via PUBLISHED_IN where year is 2002!",
+    "schema": "Relevant node labels and their properties (with datatypes) are:\nArticle {abstract: STRING}\nJournal {}\n\nRelevant relationships are:\n{'start': Article, 'type': PUBLISHED_IN, 'end': Journal }\n\n\nRelevant relationship properties (with datatypes) are:\nPUBLISHED_IN {year: STRING}",
+    "ground_truth": "MATCH (n:Article) -[r:PUBLISHED_IN]->(m:Journal) WHERE r.year = '2002' RETURN n.abstract AS abstract, count(m) AS count",
+    "predicted": "MATCH (n:Article) -[r:PUBLISHED_IN]->(m:Journal) WHERE r.year <> '2002' RETURN abstract(n) AS abstract, count(m) AS count_journal AS journal_count AS journal_journal AS summary) AS summary AS summary_referenced_nodes WHERE summary_referenced_nodes.journal_count = 1 RETURN summary_referenced_nodes.abstract AS abstract, count_journal AS journal_count AS journal_journal AS summary AS summary_referenced_nodes WHERE summary_referenced_nodes.journal_count = 1 LIMIT 1 RETURN summary AS summary_referenced_nodes LIMIT 1 MATCH (n:Article) -[r:PUBLISHED_IN]->(m:Journal) WHERE r.year <> '2002' RETURN abstract(n) AS abstract, count(m) AS count_journal AS journal_count AS journal_journal AS summary AS summary AS summary_referenced_nodes WHERE summary_referenced_nodes.journal_count = 1 LIMIT 1 RETURN summary AS summary_referenced_nodes LIMIT 1 MATCH (n",
+    "exact_match": 0,
+    "token_f1": 0.5945945945945945,
+    "structural_validity": 1
+  },
+  {
+    "question": "What are the first 3 languages spoken in streams with more than 10,000 followers?",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (s:Stream)-[:HAS_LANGUAGE]->(l:Language) WHERE s.followers > 10000 RETURN l.name AS language, count(*) AS count ORDER BY count DESC LIMIT 3",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "Which nodes are at the end of a path starting from Article, with title equal to  Summation and transformation formulas for elliptic hypergeometric series, passing through DOI via HAS_DOI?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {title: STRING}\nDOI {}\n\nRelevant relationships are:\n{'start': Article, 'type': HAS_DOI, 'end': DOI }",
+    "ground_truth": "MATCH (a:Article{title:'Summation and transformation formulas for elliptic hypergeometric series'})-[:HAS_DOI]->(c:DOI)-[r]->(n) RETURN n",
+    "predicted": "MATCH (a:Article{title:'Summation and transformation formulas for elliptic hypergeometric series'})-[r:HAS_DOI]->(d:DOI) WHERE ANY(key in keys(a) WHERE a[key] = r) RETURN d.title AS path, d.type AS path_type RETURN path_type, path_name(path) AS path AS path_name RETURN path_name(path) AS path RETURN path_name(path) AS path_name RETURN path_name(path) AS path RETURN path_name(path) AS path_name RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN path_name(path) AS path RETURN",
+    "exact_match": 0,
+    "token_f1": 0.4864864864864865,
+    "structural_validity": 1
+  },
+  {
+    "question": "Retrieve the category_id for Categories that is linked through a HAS_CATEGORY relationship with the Article where article_id is 603207!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {article_id: INTEGER}\nCategories {category_id: STRING}\n\nRelevant relationships are:\n{'start': Article, 'type': HAS_CATEGORY, 'end': Categories }",
+    "ground_truth": "MATCH (n:Article) -[ha:HAS_CATEGORY]->(m) WHERE n.article_id='603207' RETURN m.category_id",
+    "predicted": "MATCH (n:Article) WHERE n.article_id = '603207' RETURN n.category_id AS category_id RETURN category_id MATCH (m:Category)-[r]->(n) RETURN m.category_id RETURN r MATCH (m:Category)-[r]->(n) RETURN n.type MATCH (m:Category)-[r]->(m) RETURN m.type RETURN m.type RETURN n.type RETURN n.type RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RETURN category_id RET",
+    "exact_match": 0,
+    "token_f1": 0.4166666666666667,
+    "structural_validity": 1
+  },
+  {
+    "question": "Which nodes are connected to Author where first_name is A., and also to another node?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nAuthor {first_name: STRING}",
+    "ground_truth": "MATCH (a:Author{first_name:'A.'})-[r]->(n), (n)-[s]->(m) RETURN labels(n) AS Interim, labels(m) AS Target",
+    "predicted": "MATCH (a:Author{first_name:'A'})-[:A->[](){1,2}]-(n) WHERE n.first_name='A' RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN",
+    "exact_match": 0,
+    "token_f1": 0.26666666666666666,
+    "structural_validity": 1
+  },
+  {
+    "question": "Which streams have the most distinct games played? List the top 5.",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (s:Stream)-[:PLAYS]->(g:Game) WITH s, COUNT(DISTINCT g) AS distinctGames ORDER BY distinctGames DESC LIMIT 5 RETURN s.name AS streamName, distinctGames",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "List the top 5 movies with a tagline containing 'football'.",
+    "schema": "Node properties:\n- **Movie**\n  - `title`: STRING Example: \"The Matrix\"\n  - `votes`: INTEGER Min: 1, Max: 5259\n  - `tagline`: STRING Example: \"Welcome to the Real World\"\n  - `released`: INTEGER Min: 1975, Max: 2012\n- **Person**\n  - `born`: INTEGER Min: 1929, Max: 1996\n  - `name`: STRING Example: \"Keanu Reeves\"\nRelationship properties:\n- **ACTED_IN**\n  - `roles: LIST` Min Size: 1, Max Size: 6\n- **REVIEWED**\n  - `summary: STRING` Available options: ['Pretty funny at times', 'A solid romp', 'Silly, but fun', 'You had me at Jerry', 'An amazing journey', 'Slapstick redeemed only by the Robin Williams and ', 'Dark, but compelling', 'The coolest football movie ever', 'Fun, but a little far fetched']\n  - `rating: INTEGER` Min: 45, Max:  100\nThe relationships:\n(:Person)-[:ACTED_IN]->(:Movie)\n(:Person)-[:DIRECTED]->(:Movie)\n(:Person)-[:PRODUCED]->(:Movie)\n(:Person)-[:WROTE]->(:Movie)\n(:Person)-[:FOLLOWS]->(:Person)\n(:Person)-[:REVIEWED]->(:Movie)",
+    "ground_truth": "MATCH (m:Movie) WHERE m.tagline CONTAINS 'football' RETURN m ORDER BY m.released DESC LIMIT 5",
+    "predicted": "MATCH (m:Movie) WHERE m.tagline IN ('football')) RETURN m.title AS Movie, m.tagline AS Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tagline ORDER BY Tagline DESC LIMIT 5 RETURN Tag",
+    "exact_match": 0,
+    "token_f1": 0.6451612903225806,
+    "structural_validity": 1
+  },
+  {
+    "question": "Which streams have a follower count between 1000 and 5000 and play the game 'Rust'?",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (s:Stream)-[:PLAYS]->(:Game {name: 'Rust'}) WHERE s.followers >= 1000 AND s.followers <= 5000 RETURN s.name AS stream, s.followers AS followerCount",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "Find the Article for which comments is 21 pages, AMS-LaTeX!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {comments: STRING}",
+    "ground_truth": "MATCH (n:Article {comments:'21 pages, AMS-LaTeX'}) RETURN n",
+    "predicted": "MATCH (n:Article) -[:MATCH (m:MATCH (n)->[*21]->'21 pages, 'AMS-LaTeX') RETURN m OR m RETURN n RETURN n RETURN m RETURN n RETURN m RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n RETURN n",
+    "exact_match": 0,
+    "token_f1": 0.4444444444444444,
+    "structural_validity": 1
+  },
+  {
+    "question": "Search for the name in Journal that is linked through a PUBLISHED_IN relationship with Article where article_id is 6147 and PUBLISHED_IN has meta on 227!",
+    "schema": "Relevant node labels and their properties (with datatypes) are:\nArticle {article_id: INTEGER}\nJournal {name: STRING}\n\nRelevant relationships are:\n{'start': Article, 'type': PUBLISHED_IN, 'end': Journal }\n\n\nRelevant relationship properties (with datatypes) are:\nPUBLISHED_IN {meta: STRING}",
+    "ground_truth": "MATCH (n:Article) -[pu:PUBLISHED_IN {meta : '227'}]->(m) WHERE n.article_id='6147' RETURN m.name",
+    "predicted": "MATCH (n:Article) -[PUBLISHED_IN {meta: '227'}]->(m:Journal) WHERE n.article_id = 6147 AND m.PUBLISHED_IN has meta on 227 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN name; RETURN m.name LIMIT 1 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN m.name LIMIT 1 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN m.name LIMIT 1 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN m.name LIMIT 1 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN m.name LIMIT 1 RETURN m.name AS name ORDER BY name DESC LIMIT 1 RETURN m.name AS name ORDER BY",
+    "exact_match": 0,
+    "token_f1": 0.28571428571428575,
+    "structural_validity": 1
+  },
+  {
+    "question": "How many nodes are connected to Topic for which cluster is 9, by exactly two different types of relationships?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nTopic {cluster: INTEGER}",
+    "ground_truth": "MATCH (a:Topic{cluster:'9'})-[r]->(n) WITH n, COLLECT(DISTINCT TYPE(r)) AS Types WHERE SIZE(Types) = 2 RETURN COUNT(n)",
+    "predicted": "MATCH (a:Topic{cluster:'9'})-[r]->(n) RETURN count(n) AS nodes, count(r) AS relationships, count(r) AS totalRelationships WHERE r = '2' RETURN nodes, count(r) AS totalRelationships LIMIT 2) AS results WHERE LIMIT 2 LIMIT 2 LIMIT 2 MATCH (a:Topic{cluster:'9'})-[r]->(n) RETURN count(n) AS nodes, count(r) AS totalRelationships WHERE r = '2' RETURN nodes, count(r) AS totalRelationships LIMIT 2 LIMIT 2 LIMIT 2 MATCH (a:Topic{cluster:'8'})-[r]->(n) RETURN count(n) AS nodes, count(r) AS totalRelationships WHERE r = '2' RETURN nodes, count(r) AS totalRelationships LIMIT 2 LIMIT 2 LIMIT 2 MATCH (a:Topic{cluster:'7'})-[r]->(n) RETURN count(n) AS nodes, count(r) AS totalRelationships WHERE r = '2' RETURN nodes, count(r) AS totalRelations",
+    "exact_match": 0,
+    "token_f1": 0.4117647058823529,
+    "structural_validity": 1
+  },
+  {
+    "question": "Enumerate the properties of nodes that are either directly or indirectly connected to Author for which last_name is Mason!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nAuthor {last_name: STRING}",
+    "ground_truth": "MATCH (a:Author{last_name:'Mason'})-[*]->(n) RETURN DISTINCT properties(n) AS Properties",
+    "predicted": "MATCH (a:Author{last_name:'Mason'})-[r]->(n) RETURN properties(n) AS props, TYPE(r) AS propsType, TYPE(r) AS propsTypeType WHERE propsTypeType = 'Direct' OR propsTypeType = 'Inferior' RETURN propsTypeType, propsTypeTypeType) RETURN propsTypeType AS propsTypeTypeType, propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS propsTypeTypeTypeType AS props",
+    "exact_match": 0,
+    "token_f1": 0.3076923076923077,
+    "structural_validity": 1
+  },
+  {
+    "question": "Are there any nodes that are connected with Article where title is Free Field Construction for the ABF Models in Regime II and share a common property with UpdateDate, for which update_date equals 2008-01-29?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {title: STRING}\nUpdateDate {update_date: DATE}",
+    "ground_truth": "MATCH (a:Article{title:'Free Field Construction for the ABF Models in Regime II'})-[r]->(n), (d:UpdateDate{update_date:'2008-01-29'}) WHERE ANY(key in keys(n) WHERE n[key] = d[key]) RETURN n",
+    "predicted": "MATCH (a:Article{title:'Free Field Construction for the ABF Models in Regime II'})-[r:UpdateDate]->(b:UpdateDate) WHERE ANY(key in keys(a) WHERE a[key] = b[key]) RETURN b.title AS n, b.update_date AS d AS n RETURN n EXists, n UNION ALL EXists WHERE ANY(key in keys(a) WHERE a[key] = b[key]) RETURN a.title AS n RETURN a.update_date AS d RETURN n EXists, n UNION ALL EXists WHERE ANY(key in keys(a) WHERE a[key] = b[key]) RETURN a.title AS n RETURN a.update_date AS d RETURN n EXists, n UNION ALL EXists WHERE ANY(key in keys(a) WHERE a[key] = b[key]) RETURN a.title AS n RETURN a.update_date AS d RETURN n EXists, n UNION ALL EXists WHERE ANY(key in keys(a) WHERE a[key] = b[key]) RETURN a.title AS n RETURN a.update",
+    "exact_match": 0,
+    "token_f1": 0.5882352941176471,
+    "structural_validity": 1
+  },
+  {
+    "question": "Find comments of the Article and return it along with the count of Journal that are linked via PUBLISHED_IN where pages is 641-672!",
+    "schema": "Relevant node labels and their properties (with datatypes) are:\nArticle {comments: STRING}\nJournal {}\n\nRelevant relationships are:\n{'start': Article, 'type': PUBLISHED_IN, 'end': Journal }\n\n\nRelevant relationship properties (with datatypes) are:\nPUBLISHED_IN {pages: STRING}",
+    "ground_truth": "MATCH (n:Article) -[r:PUBLISHED_IN]->(m:Journal) WHERE r.pages = '641-672' RETURN n.comments AS comments, count(m) AS count",
+    "predicted": "MATCH (n:Article) -[r:PUBLISHED_IN]->(m:Journal) WHERE r.pages = '641-672' RETURN n.comments AS comments, count(m) AS countJournal AS countJournal LIMIT 0, 1 ORDER BY countJournal DESC LIMIT 1 RETURN m ORDER BY countJournal DESC LIMIT 1 LIMIT 1 UNLIMIT m LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT 1 LIMIT",
+    "exact_match": 0,
+    "token_f1": 0.7058823529411765,
+    "structural_validity": 1
+  },
+  {
+    "question": "List the types of relationships and their counts connected to Article for which article_id is 1071!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {article_id: INTEGER}",
+    "ground_truth": "MATCH (a:Article{article_id:'1071'})-[r]->() RETURN TYPE(r) AS Relations, COUNT(r) AS Counts",
+    "predicted": "MATCH (n:Article) WHERE n.article_id = 1071 RETURN TYPE(n) AS types, COUNT(p) AS count_paired ORDER BY types DESC LIMIT 1 RETURN types, count_paired) AS results SET cursor = conn LIMIT results; RETURN results; RETURN types, count_paired ORDER BY types DESC LIMIT 1 RETURN count_paired;  RETURN TYPE(results) AS results AS results_referenced MATCH (n:Article) WHERE n.article_id = 1071 RETURN TYPE(n) AS types, count_paired ORDER BY types DESC LIMIT 1 RETURN types, count_paired ORDER BY types DESC LIMIT 1 RETURN count_paired RETURN types, count_paired ORDER BY types DESC LIMIT 1 RETURN count_paired RETURN types, count_paired ORDER BY types DESC LIMIT 1 RETURN count_paired RETURN count_paired RETURN TYPE(results) AS results AS results_referenced MATCH (n:Article) WHERE n.article_id = 1071 RET",
+    "exact_match": 0,
+    "token_f1": 0.16666666666666666,
+    "structural_validity": 1
+  },
+  {
+    "question": "List the distinct properties of nodes that are 2 hops away from Report with report_no equal to PAM-780!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nReport {report_no: STRING}",
+    "ground_truth": "MATCH (a:Report{report_no:'PAM-780'})-[*2]->(n) RETURN DISTINCT properties(n) AS props",
+    "predicted": "MATCH (a:Report{report_no:'PAM-780'})-[*2]->(n) RETURN DISTINCT properties(n) AS props, TYPE(n) AS property WHERE n <> Report WITH TYPE(n) AS property RETURN props, property) AS Descendants WHERE Descendants != [] RETURN Descendants LIMIT 1 DESC LIMIT 1 DESC LIMIT 1 MATCH (a:Report{report_no:'PAM-780'})-[*2]->(n) RETURN props AS Descendants AS Descendants LIMIT 1 DESC LIMIT 1 DESC LIMIT 1 MATCH (a:Report{report_no:'PAM-780'})-[*2]->(n) RETURN props AS Descendants AS Descendants LIMIT 1 DESC LIMIT 1 DESC LIMIT 1 MATCH (a:Report{report_no:'PAM-780'})-[*2]->(n) RETURN props AS Descendants AS Descendants LIMIT 1 DESC LIMIT 1 DESC LIMIT 1 MATCH (a:Report{report_no:'",
+    "exact_match": 0,
+    "token_f1": 0.4666666666666667,
+    "structural_validity": 1
+  },
+  {
+    "question": "Which 3 users have VIP status on the most streams?",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (u:User)-[:VIP]->(s:Stream) WITH u, COUNT(s) AS vip_stream_count ORDER BY vip_stream_count DESC LIMIT 3 RETURN u.name AS userName, vip_stream_count",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "What are the descriptions of streams that play 'Call of Duty: Warzone'?",
+    "schema": "Node properties:\n- **Stream**\n  - `createdAt`: DATE_TIME Min: 2007-05-22T10:39:53.259969Z, Max: 2021-05-09T14:16:40.370294Z\n  - `id`: STRING Example: \"129004176\"\n  - `description`: STRING Example: \"Welcome to my Channel, I'm Big Chase, 31 living in\"\n  - `url`: STRING Example: \"https://www.twitch.tv/itsbigchase\"\n  - `name`: STRING Example: \"itsbigchase\"\n  - `followers`: INTEGER Min: 0, Max: 10243195\n  - `total_view_count`: INTEGER Min: 21, Max: 1451487256\n- **Game**\n  - `name`: STRING Example: \"Rust\"\n- **Language**\n  - `name`: STRING Example: \"en\"\n- **User**\n  - `name`: STRING Example: \"itsbigchase\"\n- **Team**\n  - `createdAt`: DATE_TIME Min: 2011-10-11T23:59:43.548701Z, Max: 2021-05-07T17:19:09.946382Z\n  - `name`: STRING Example: \"ESO Stream Team\"\n  - `id`: STRING Example: \"5893\"\nRelationship properties:\n\nThe relationships:\n(:Stream)-[:PLAYS]->(:Game)\n(:Stream)-[:HAS_LANGUAGE]->(:Language)\n(:Stream)-[:MODERATOR]->(:Stream)\n(:Stream)-[:MODERATOR]->(:User)\n(:Stream)-[:CHATTER]->(:Stream)\n(:Stream)-[:CHATTER]->(:User)\n(:Stream)-[:HAS_TEAM]->(:Team)\n(:Stream)-[:VIP]->(:Stream)\n(:Stream)-[:VIP]->(:User)\n(:User)-[:CHATTER]->(:Stream)\n(:User)-[:CHATTER]->(:User)\n(:User)-[:MODERATOR]->(:Stream)\n(:User)-[:MODERATOR]->(:User)",
+    "ground_truth": "MATCH (s:Stream)-[:PLAYS]->(g:Game {name: 'Call of Duty: Warzone'}) RETURN s.description AS StreamDescription",
+    "predicted": "->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User)\n(:Stream)-[:VIP]->(:User",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "How many unique relationships originate from Article where abstract is   The Wakimoto construction for the quantum affine algebra U_q(\\hat{sl}_2)\nadmits a reduction to the q-deformed parafermion algebras. We interpret the\nlatter theory as a free field realization of the Andrews-Baxter-Forrester\nmodels in regime II. We give multi-particle form factors of some local\noperators on the lattice and compute their scaling limit, where the models are\ndescribed by a massive field theory with Z_k symmetric minimal scattering\nmatrices.\n?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {abstract: STRING}",
+    "ground_truth": "MATCH (a:Article{abstract:'  The Wakimoto construction for the quantum affine algebra U_q(\\hat{sl}_2) admits a reduction to the q-deformed parafermion algebras. We interpret the latter theory as a free field realization of the Andrews-Baxter-Forrester models in regime II. We give multi-particle form factors of some local operators on the lattice and compute their scaling limit, where the models are described by a massive field theory with Z_k symmetric minimal scattering matrices. '})-[r]->() RETURN COUNT(DISTINCT TYPE(r)) AS rels, TYPE(r)",
+    "predicted": "MATCH (a:Article{abstract:'The Wakimoto construction for the quantum affine algebra U_q(\\hat{sl}_2)'})-[r]->(n) RETURN count(r) AS n, count(r) AS m LIMIT 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1) WHERE n > 1 RETURN count(r) AS m LIMIT 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1",
+    "exact_match": 0,
+    "token_f1": 0.2325581395348837,
+    "structural_validity": 1
+  },
+  {
+    "question": "List characters with the lowest 5 book1PageRanks.",
+    "schema": "Node properties:\n- **Character**\n  - `centrality`: FLOAT Min: 0.0, Max: 1.0\n  - `book45PageRank`: FLOAT Min: 0.15000000000000002, Max: 11.409916274911177\n  - `fastrf_embedding`: LIST Min Size: 10, Max Size: 10\n  - `book1BetweennessCentrality`: FLOAT Min: 0.0, Max: 4638.53495125504\n  - `book1PageRank`: FLOAT Min: 0.15000000000000002, Max: 8.164174336296284\n  - `louvain`: INTEGER Min: 0, Max: 10\n  - `community`: INTEGER Min: 504, Max: 795\n  - `degree`: FLOAT Min: 0.0, Max: 300.0\n  - `name`: STRING Example: \"Addam-Marbrand\"\n  - `pagerank`: FLOAT Min: 0.15000000000000002, Max: 9.473142454730429\nRelationship properties:\n- **INTERACTS**\n  - `weight: INTEGER` Min: 3, Max:  334\n- **INTERACTS1**\n  - `weight: INTEGER` Min: 3, Max:  291\n  - `book: INTEGER` Min: 1, Max:  1\n- **INTERACTS2**\n  - `weight: INTEGER` Min: 3, Max:  92\n  - `book: INTEGER` Min: 2, Max:  2\n- **INTERACTS3**\n  - `weight: INTEGER` Min: 3, Max:  95\n  - `book: INTEGER` Min: 3, Max:  3\n- **INTERACTS45**\n  - `weight: INTEGER` Min: 3, Max:  96\n  - `book: INTEGER` Min: 45, Max:  45\nThe relationships:\n(:Character)-[:INTERACTS45]->(:Character)\n(:Character)-[:INTERACTS]->(:Character)\n(:Character)-[:INTERACTS1]->(:Character)\n(:Character)-[:INTERACTS3]->(:Character)\n(:Character)-[:INTERACTS2]->(:Character)",
+    "ground_truth": "MATCH (c:Character) WHERE c.book1PageRank IS NOT NULL RETURN c.name AS character, c.book1PageRank AS pageRank ORDER BY pageRank LIMIT 5",
+    "predicted": "`weight: INTEGER` Min: 3, Max:  10\n  - `book: INTEGER` Min: 1, Max:  1\n- **INTERACTS45PageRank**\n  - `weight: INTEGER` Min: 3, Max:  1, Min Size: 10\n  - `book: INTEGER` Min Size: 1, Max Size: 10\n  - `fastrf_embedding`: LIST Min Size: 10, Max Size: 10\n  - `book1BetweennessCentrality`: FLOAT Min Size: 0.0, Max Size: 4638.53495125504\n  - `book1PageRank`: FLOAT Min Size: 0.15000000000000002, Max Size: 8.164174336296284\n  - `louvain`: INTEGER Min: 0, Max: 10\n  - `community`: INTEGER Min: 504, Max: 795\n  - `degree`: FLO",
+    "exact_match": 0,
+    "token_f1": 0.0,
+    "structural_validity": 0
+  },
+  {
+    "question": "Look for the comments of the Article that is not related  to the Report with the  report_id  5049b80a2935f95cc95cf14dbfb8c610!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {comments: STRING}\nReport {report_id: STRING}",
+    "ground_truth": "MATCH (n:Article), (:Report {report_id: '5049b80a2935f95cc95cf14dbfb8c610'}) WHERE NOT (n) --> (:Report) RETURN n.comments",
+    "predicted": "MATCH (n:Article) -[r:NotRelated(:Report{report_id:5049b80a2935f95cc95cf14dbfb8c610})/:*{} RETURN n.comments AS comments, n.report_id AS report_id AS props' AS props' LIMIT 1) AS props' AS props ORDER BY props.report_id DESC LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT 1 RETURN props AS props LIMIT",
+    "exact_match": 0,
+    "token_f1": 0.2,
+    "structural_validity": 1
+  },
+  {
+    "question": "For each Article, find the number of Author linked via WRITTEN_BY and retrieve the abstract of the Article and the Author counts in ascending order!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {abstract: STRING}\nAuthor {}\n\nRelevant relationships are:\n{'start': Article, 'type': WRITTEN_BY, 'end': Author }",
+    "ground_truth": "MATCH (n:Article) -[:WRITTEN_BY]->(m:Author) WITH DISTINCT n, m RETURN n.abstract AS abstract, count(m) AS author_count ORDER BY author_count",
+    "predicted": "MATCH (n:Article) -[r:WRITTEN_BY]->(m:Author) WHERE r.type='WRITTEN_BY' AND n.abstract <> 'Author' RETURN n.abstract, COUNT(m) AS count AS AuthorCount ORDER BY count DESC LIMIT 1 LIMIT 1 RETURN count LIMIT 1 UNDER m LIMIT m.abstract ORDER BY count DESC LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m.abstract LIMIT m",
+    "exact_match": 0,
+    "token_f1": 0.4210526315789474,
+    "structural_validity": 1
+  },
+  {
+    "question": "List the properties of nodes that are 3 hops away from Article with article_id equal to 1063!",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nArticle {article_id: INTEGER}",
+    "ground_truth": "MATCH (a:Article)-[*3]->(n) WHERE a.article_id = '1063' RETURN properties(n) AS props",
+    "predicted": "MATCH (a:Article{article_id:'1063'})-[*3]->(n) RETURN properties(n) AS props, DISTINCT props.article_id AS key, DISTINCT props.article_id' WHERE props.article_id <> 1063 RETURN props AS props UNION ALL MATCH (a:Article{article_id:'1063'})-[*3]->(n) RETURN props AS props MATCH (a:Article{article_id:'1063'})-[*3]->(n) RETURN props AS props UNION ALL MATCH (a:Article{article_id:'1063'})-[*3]->(n) RETURN props AS props MATCH (a:Article{article_id:'1063'})-[*3]->(n) RETURN props AS props UNION ALL MATCH (a:Article{article_id:'1063'})-[*3]->(n) RETURN props AS props MATCH (a:Article{article_id:'1063'})-[*3]->(",
+    "exact_match": 0,
+    "token_f1": 0.4444444444444445,
+    "structural_validity": 1
+  },
+  {
+    "question": "How many paths are there between Author where last_name is Leoni and Topic, for which cluster equals 6?",
+    "schema": "Graph schema: Relevant node labels and their properties (with datatypes) are:\nAuthor {last_name: STRING}\nTopic {cluster: INTEGER}",
+    "ground_truth": "MATCH p=(a:Author{last_name:'Leoni'})-[*]->(d:Topic{cluster:'6'}) RETURN count(p)",
+    "predicted": "MATCH (a:Author{last_name:'Leoni'})-[*]->(n) RETURN count(p) AS paths LIMIT 2, 2; RETURN paths; RETURN count(p) AS paths LIMIT 2, 2; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths; RETURN paths;",
+    "exact_match": 0,
+    "token_f1": 0.4285714285714285,
+    "structural_validity": 1
+  }
+]
