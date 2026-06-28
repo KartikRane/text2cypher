@@ -24,7 +24,7 @@ def _format_training_example(example: dict) -> dict[str, str]:
     }
 
 
-def load_text2cypher_dataset(
+def  load_text2cypher_dataset(
     dataset_name: str = DEFAULT_DATASET_NAME,
     cache_dir: str | Path | None = None,
 ) -> DatasetDict:
@@ -34,7 +34,10 @@ def load_text2cypher_dataset(
         cache_dir=str(cache_dir) if cache_dir is not None else None,
     )
 
-    missing_splits = [split for split in REQUIRED_SPLITS if split not in dataset]
+    missing_splits = [
+        split for split in REQUIRED_SPLITS 
+        if split not in dataset
+    ]
     if missing_splits:
         raise ValueError(f"Dataset is missing required splits: {missing_splits}")
 

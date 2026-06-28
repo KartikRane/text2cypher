@@ -23,7 +23,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model-name", default=DEFAULT_MODEL_NAME)
     parser.add_argument("--dataset-name", default=DEFAULT_DATASET_NAME)
-    parser.add_argument("--output-dir", type=Path, default=Path("final_model"))
+    parser.add_argument("--output-dir", type=Path, default=Path("final_model")) #"imp"
     parser.add_argument("--cache-dir", type=Path, default=None)
     parser.add_argument("--max-seq-length", type=int, default=512)
     parser.add_argument(
