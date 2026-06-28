@@ -61,8 +61,23 @@ Quick test run on 200 examples (~30 minutes on CPU):
 python src/train.py --max-train-samples 200
 ```
 
-Training saves the final LoRA adapter and tokenizer to `./final_model/`.
-Intermediate checkpoints are saved to `./checkpoints/` after each epoch.
+By default, `train.py` uses the original full-prompt SFT objective, where loss
+is computed over the schema, question, and Cypher tokens. To compare it against
+completion-only loss, train the two variants into separate directories:
+
+```bash
+# Original full-prompt loss
+python src/train.py --loss-mode full --output-dir final_model_full_prompt
+python src/evaluate.py --model-dir final_model_full_prompt --output-file results/predictions_full_prompt.json
+
+# Completion-only loss after "### Cypher:"
+python src/train.py --loss-mode completion --output-dir final_model_completion_only
+python src/evaluate.py --model-dir final_model_completion_only --output-file results/predictions_completion_only.json
+```
+
+Without `--output-dir`, training saves the final LoRA adapter and tokenizer to
+`./final_model/`. Intermediate checkpoints are saved inside the selected output
+directory after each epoch.
 
 **Training configuration:**
 - Epochs: 3
@@ -92,15 +107,18 @@ to `results/predictions.json`.
 
 **Evaluation results:**
 
-| Metric | Score |
-|--------|-------|
-| Exact Match | 0.00% |
-| Token F1 | 27.4% |
-| Structural Validity | 74.0% |
+| Training objective | Exact Match | Token F1 | Structural Validity |
+|--------------------|-------------|----------|---------------------|
+| Full-prompt loss | 0.00% | 27.4% | 74.0% |
+| Completion-only loss | 0.00% | 33.4% | 78.0% |
 
 
 Token F1 improved 64% when scaling from 200 to 1,000 training examples
 (16.7% → 27.4%), confirming genuine learning from more data.
+
+Completion-only loss further improved Token F1 from 27.4% to 33.4% and
+Structural Validity from 74.0% to 78.0%, suggesting that masking the schema and
+question tokens better aligns training with the generation task.
 
 ## Design Decisions & Limitations
 
@@ -146,14 +164,14 @@ Validation loss tracked closely at 0.87, indicating no significant overfitting.
 Token F1 improved from 16.7% (200 samples) to 27.4% (1,000 samples) — a 64%
 relative improvement — confirming the model benefits from more data.
 
-Inspection of predictions.json reveals the model learned:
+Inspection of predictions.json and completion_only.json reveals the model learned:
 - Basic MATCH clause structure with correct node labels from the schema
 - Simple WHERE filters for equality and comparison conditions
 - RETURN clauses with correct property names on simple schemas
 
 ### Where it fails
 
-Three failure modes appear consistently in predictions.json:
+Three failure modes appear consistently across the saved prediction files:
 
 1. **Repetition loops** — the model generates a valid opening clause then
    repeats the same token indefinitely until max_new_tokens is reached.
@@ -178,9 +196,9 @@ properties, and evaluate on held-out schemas to measure compositional
 generalization.
 
 With more compute, I would compare LoRA ranks and target modules, increase
-max_seq_length to 1024 to handle complex schemas without truncation, use
-completion-only loss so the model only learns from the Cypher output rather
-than the full prompt, and benchmark a larger base model.
+max_seq_length to 1024 to handle complex schemas without truncation, combine
+completion-only loss with schema-aware truncation, and benchmark a larger base
+model.
 
 For a stronger evaluation, I would add syntax validation and execution-based
 comparison against isolated read-only Neo4j fixtures. A production system
